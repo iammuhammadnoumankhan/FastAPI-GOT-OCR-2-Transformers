@@ -1,9 +1,6 @@
 ```markdown
 # GOT-OCR 2.0 Microservice 🚀
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-
 State-of-the-art OCR microservice powered by Transformers and FastAPI, supporting multiple OCR tasks and formats.
 
 ## 📌 Key Features
@@ -28,7 +25,7 @@ State-of-the-art OCR microservice powered by Transformers and FastAPI, supportin
 ### Without Docker
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/got-ocr-service.git
+git clone https://github.com/iammuhammadnoumankhan/FastAPI-GOT-OCR-2-Transformers.git
 cd got-ocr-service
 
 # Install dependencies
