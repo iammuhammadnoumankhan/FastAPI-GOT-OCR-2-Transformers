@@ -1,0 +1,13 @@
+# File: requirements.txt
+fastapi
+uvicorn
+python-multipart
+opencv-python
+torch
+torchvision
+git+https://github.com/huggingface/transformers.git@main
+accelerate
+verovio
+opencv-python
+numpy==1.26.3
+pillow
