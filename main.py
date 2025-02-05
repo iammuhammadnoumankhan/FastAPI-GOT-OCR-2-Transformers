@@ -16,9 +16,19 @@ from globe import ocr_types, ocr_colors, tasks, stop_str, title, description
 from transformers import AutoModelForImageTextToText, AutoProcessor
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="GOT-OCR 2.0 Microservice", 
-              description=description,
-              version="2.0")
+app = FastAPI(
+    title="GOT-OCR 2.0 API",
+    description=description,
+    version="2.0",
+    contact={
+        "name": "API Support",
+        "email": "noumankhanonai@gmail.com"
+    },
+    license_info={
+        "name": "Apache 2.0",
+        "url": "https://github.com/iammuhammadnoumankhan/FastAPI-GOT-OCR-2-Transformers/blob/main/LICENSE.txt"
+    }
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -192,15 +202,63 @@ def process_image_sync(
     
 
 @app.post("/process", 
-          summary="Process OCR request",
-          response_description="OCR processing results")
+          summary="Process images for text extraction",
+          response_description="OCR processing results with text and optional HTML output")
 async def process_ocr(
     background_tasks: BackgroundTasks,
-    task: str = Form(..., description="OCR task type", example="Plain Text OCR"),
-    ocr_type: Optional[str] = Form(None, description="OCR type for formatted output"),
-    ocr_box: Optional[str] = Form(None, description="Bounding box coordinates [x1,y1,x2,y2]"),
-    ocr_color: Optional[str] = Form(None, description="Highlight color for regions"),
-    images: List[UploadFile] = File(..., description="Input images for processing")
+    task: str = Form(
+        ...,
+        title="OCR Task Type",
+        description=(
+            "Select the type of OCR processing to perform. Available options:\n\n"
+            "- **Plain Text OCR**: Basic text extraction from images\n"
+            "- **Format Text OCR**: Structured text output (LaTeX/Markdown)\n"
+            "- **Fine-grained OCR (Box)**: Extract text from specific regions using coordinates\n"
+            "- **Fine-grained OCR (Color)**: Extract text from color-highlighted regions\n"
+            "- **Multi-crop OCR**: Process multiple image regions automatically\n"
+            "- **Multi-page OCR**: Process multi-page documents"
+        ), 
+        example="Plain Text OCR"),
+    ocr_type: Optional[str] = Form(
+        None,
+        title="Output Formatting", 
+        description=(
+            "Required for formatted outputs. Use 'format' to enable structured text output.\n\n"
+            "Applies to:\n"
+            "- Format Text OCR\n"
+            "- Multi-crop OCR\n"
+            "- Multi-page OCR"),
+        example="format"
+        ),
+    ocr_box: Optional[str] = Form(
+        None,
+        title="Bounding Box Coordinates", 
+        description=(
+            "Required for box-based extraction. Format as [x1,y1,x2,y2] where:\n\n"
+            "- x1: Top-left X coordinate\n"
+            "- y1: Top-left Y coordinate\n"
+            "- x2: Bottom-right X coordinate\n"
+            "- y2: Bottom-right Y coordinate\n\n"
+            "Example: [100,200,300,400]"),
+        example="[100,100,300,300]"
+        ),
+    ocr_color: Optional[str] = Form(
+        None, 
+        title="Highlight Color",
+        description="Select color for region-based extraction (red, green, blue)",
+        example="red"
+        ),
+    images: List[UploadFile] = File(
+        ..., 
+        title="Input Images",
+        description=(
+            "Upload image files for processing. Supported formats:\n\n"
+            "- JPEG/JPG\n"
+            "- PNG\n"
+            "- TIFF\n\n"
+            "For multi-page processing, upload multiple files in order"
+        )
+        )
 ):
     """Main OCR processing endpoint supporting all GOT-OCR 2.0 features"""
     
@@ -262,8 +320,8 @@ async def process_ocr(
     return JSONResponse(content=response)
 
 @app.get("/results/{result_id}", 
-         summary="Retrieve processed results",
-         response_description="HTML content of processed result")
+         summary="Retrieve formatted OCR results",
+         response_description="HTML-rendered OCR output",)
 async def get_result(result_id: str):
     """Retrieve HTML-rendered results by ID"""
     # Implement result storage/retrieval logic here
