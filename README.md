@@ -40,11 +40,11 @@ CUDA_VISIBLE_DEVICES=0 uvicorn main:app --host 0.0.0.0 --port 8000
 
 ### With Docker
 ```bash
-# Build and run
-docker-compose up --build
+# Build the Docker image:
+docker build -t got-ocr-service .
 
-# GPU version (nvidia-docker required)
-docker-compose -f docker-compose-gpu.yml up --build
+# Run the container:
+docker run -p 8000:8000 --gpus all got-ocr-service
 ```
 
 ## 🚀 Usage
