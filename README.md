@@ -1,4 +1,3 @@
-```markdown
 # GOT-OCR 2.0 Microservice 🚀
 
 State-of-the-art OCR microservice powered by Transformers and FastAPI, supporting multiple OCR tasks and formats.
