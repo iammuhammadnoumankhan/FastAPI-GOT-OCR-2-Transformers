@@ -6,7 +6,7 @@ from pathlib import Path
 import time
 
 # Configuration
-API_URL = "http://localhost:8000"
+API_URL = "http://10.4.136.182:8000"
 PROCESS_ENDPOINT = f"{API_URL}/process"
 RESULTS_ENDPOINT = f"{API_URL}/results"
 TEST_IMAGES_DIR = "example-img"  # Directory containing test images

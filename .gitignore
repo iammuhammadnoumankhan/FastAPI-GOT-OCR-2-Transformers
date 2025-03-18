@@ -1,5 +1,6 @@
-frontend/
 
 __pycache__/
+.env/
+
 
 frontend.html/

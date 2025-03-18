@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOT-OCR 2.0 - Advanced OCR Service</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #4fc3f7;
+            --light: #f5f5f5;
+            --dark: #333;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f9f9f9;
+            padding: 0;
+            margin: 0;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        @media (min-width: 992px) {
+            main {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        select, input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, input[type="text"]:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+        
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 2px dashed #ccc;
+            border-radius: var(--border-radius);
+            background-color: #f9f9f9;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--accent);
+        }
+        
+        .file-upload.active {
+            border-color: var(--success);
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload p {
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .thumbnail-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .thumbnail {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .thumbnail .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(244, 67, 54, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        button i {
+            margin-right: 0.5rem;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #3d8b40;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .conditional-fields {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent);
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #2e7d32;
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-error {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #d32f2f;
+            border-left: 4px solid var(--error);
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: #ef6c00;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .text-result {
+            white-space: pre-wrap;
+            background-color: #f5f5f5;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .html-result {
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            height: 500px;
+            overflow: hidden;
+        }
+        
+        .html-result iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .download-btn {
+            margin-top: 1rem;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .footer-links {
+            margin-top: 1rem;
+        }
+        
+        .footer-links a {
+            color: var(--accent);
+            margin: 0 0.5rem;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Material Icons */
+        .material-icons {
+            font-family: 'Material Icons';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>GOT-OCR 2.0</h1>
+        <p class="subtitle">Advanced OCR Service powered by Transformers</p>
+    </header>
+    
+    <main>
+        <section>
+            <div class="card">
+                <h2>Upload & Configure</h2>
+                <form id="ocr-form">
+                    <div class="form-group">
+                        <label for="task">OCR Task Type</label>
+                        <select id="task" name="task" required>
+                            <option value="" disabled selected>Select OCR Task</option>
+                            <option value="Plain Text OCR">Plain Text OCR</option>
+                            <option value="Format Text OCR">Format Text OCR</option>
+                            <option value="Fine-grained OCR (Box)">Fine-grained OCR (Box)</option>
+                            <option value="Fine-grained OCR (Color)">Fine-grained OCR (Color)</option>
+                            <option value="Multi-crop OCR">Multi-crop OCR</option>
+                            <option value="Multi-page OCR">Multi-page OCR</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Conditional fields based on task selection -->
+                    <div id="format-fields" class="conditional-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="ocr_type">Output Formatting</label>
+                            <select id="ocr_type" name="ocr_type">
+                                <option value="format">Structured Format</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="box-fields" class="conditional-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="ocr_box">Bounding Box Coordinates [x1,y1,x2,y2]</label>
+                            <input type="text" id="ocr_box" name="ocr_box" placeholder="e.g. [100,100,300,300]">
+                        </div>
+                    </div>
+                    
+                    <div id="color-fields" class="conditional-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="ocr_color">Highlight Color</label>
+                            <select id="ocr_color" name="ocr_color">
+                                <option value="red">Red</option>
+                                <option value="green">Green</option>
+                                <option value="blue">Blue</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload Images</label>
+                        <div class="file-upload" id="file-drop-area">
+                            <i class="material-icons">cloud_upload</i>
+                            <p>Drag & drop images here or click to browse</p>
+                            <p class="small">Supported formats: JPEG, PNG, TIFF</p>
+                            <input type="file" id="images" name="images" accept="image/*" multiple required>
+                        </div>
+                        <div class="thumbnail-container" id="thumbnail-container"></div>
+                    </div>
+                    
+                    <div id="alert-container"></div>
+                    
+                    <button type="submit" id="submit-btn" class="btn-block" disabled>
+                        <span>Process Images</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+        
+        <section id="result-section" class="result-section">
+            <div class="card">
+                <h2>OCR Results</h2>
+                
+                <div class="result-tabs">
+                    <div class="tab active" data-tab="text">Text Output</div>
+                    <div class="tab" data-tab="html">HTML Render</div>
+                </div>
+                
+                <div class="tab-content active" id="text-tab">
+                    <div class="text-result" id="text-result">
+                        <!-- OCR text will appear here -->
+                    </div>
+                    <button id="copy-text-btn" class="btn-secondary download-btn">
+                        <i class="material-icons">content_copy</i> Copy Text
+                    </button>
+                    <button id="download-text-btn" class="btn-success download-btn">
+                        <i class="material-icons">download</i> Download as TXT
+                    </button>
+                </div>
+                
+                <div class="tab-content" id="html-tab">
+                    <div class="html-result">
+                        <iframe id="html-preview" sandbox="allow-same-origin allow-scripts"></iframe>
+                    </div>
+                    <button id="download-html-btn" class="btn-success download-btn">
+                        <i class="material-icons">download</i> Download as HTML
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>GOT-OCR 2.0 - Powered by Transformers and FastAPI</p>
+        <div class="footer-links">
+            <a href="https://github.com/iammuhammadnoumankhan/FastAPI-GOT-OCR-2-Transformers" target="_blank">GitHub</a>
+            <a href="http://localhost:8000/docs" target="_blank">API Documentation</a>
+        </div>
+    </footer>
+    
+    <script>
+        // API Configuration
+        const API_URL = 'http://10.4.136.182:8000';
+        const PROCESS_ENDPOINT = `${API_URL}/process`;
+        
+        // DOM Elements
+        const form = document.getElementById('ocr-form');
+        const taskSelect = document.getElementById('task');
+        const formatFields = document.getElementById('format-fields');
+        const boxFields = document.getElementById('box-fields');
+        const colorFields = document.getElementById('color-fields');
+        const fileInput = document.getElementById('images');
+        const fileDropArea = document.getElementById('file-drop-area');
+        const thumbnailContainer = document.getElementById('thumbnail-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const alertContainer = document.getElementById('alert-container');
+        const resultSection = document.getElementById('result-section');
+        const textResult = document.getElementById('text-result');
+        const htmlPreview = document.getElementById('html-preview');
+        const copyTextBtn = document.getElementById('copy-text-btn');
+        const downloadTextBtn = document.getElementById('download-text-btn');
+        const downloadHtmlBtn = document.getElementById('download-html-btn');
+        
+        // Selected files storage
+        let selectedFiles = [];
+        
+        // Show conditional fields based on task selection
+        taskSelect.addEventListener('change', function() {
+            // Hide all conditional fields first
+            formatFields.style.display = 'none';
+            boxFields.style.display = 'none';
+            colorFields.style.display = 'none';
+            
+            // Show relevant fields based on selection
+            const selectedTask = this.value;
+            
+            if (selectedTask === 'Format Text OCR' || 
+                selectedTask === 'Multi-crop OCR' || 
+                selectedTask === 'Multi-page OCR') {
+                formatFields.style.display = 'block';
+            }
+            
+            if (selectedTask === 'Fine-grained OCR (Box)') {
+                boxFields.style.display = 'block';
+            }
+            
+            if (selectedTask === 'Fine-grained OCR (Color)') {
+                colorFields.style.display = 'block';
+            }
+            
+            // Enable submit button if files are selected
+            updateSubmitButton();
+        });
+        
+        // File drag and drop handling
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            fileDropArea.classList.add('active');
+        }
+        
+        function unhighlight() {
+            fileDropArea.classList.remove('active');
+        }
+        
+        fileDropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+        
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+        
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            updateThumbnails();
+            updateSubmitButton();
+        }
+        
+        function updateThumbnails() {
+            thumbnailContainer.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                if (!file.type.match('image.*')) {
+                    showAlert('Only image files are supported', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const thumbnail = document.createElement('div');
+                    thumbnail.className = 'thumbnail';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        selectedFiles.splice(index, 1);
+                        updateThumbnails();
+                        updateSubmitButton();
+                    });
+                    
+                    thumbnail.appendChild(img);
+                    thumbnail.appendChild(removeBtn);
+                    thumbnailContainer.appendChild(thumbnail);
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function updateSubmitButton() {
+            submitBtn.disabled = selectedFiles.length === 0 || !taskSelect.value;
+        }
+        
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (selectedFiles.length === 0) {
+                showAlert('Please select at least one image', 'warning');
+                return;
+            }
+            
+            // Create FormData
+            const formData = new FormData();
+            formData.append('task', taskSelect.value);
+            
+            // Add conditional fields based on task
+            if (taskSelect.value === 'Format Text OCR' || 
+                taskSelect.value === 'Multi-crop OCR' || 
+                taskSelect.value === 'Multi-page OCR') {
+                formData.append('ocr_type', document.getElementById('ocr_type').value);
+            }
+            
+            if (taskSelect.value === 'Fine-grained OCR (Box)') {
+                const boxValue = document.getElementById('ocr_box').value;
+                if (!boxValue) {
+                    showAlert('Please enter bounding box coordinates', 'warning');
+                    return;
+                }
+                formData.append('ocr_box', boxValue);
+            }
+            
+            if (taskSelect.value === 'Fine-grained OCR (Color)') {
+                formData.append('ocr_color', document.getElementById('ocr_color').value);
+            }
+            
+            // Add all selected files
+            selectedFiles.forEach(file => {
+                formData.append('images', file);
+            });
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner"></div> Processing...';
+            
+            try {
+                const response = await fetch(PROCESS_ENDPOINT, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Processing failed');
+                }
+                
+                const result = await response.json();
+                displayResults(result);
+                showAlert('Processing completed successfully!', 'success');
+            } catch (error) {
+                showAlert(`Error: ${error.message}`, 'error');
+            } finally {
+                // Reset loading state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Process Images';
+            }
+        });
+        
+        // Display results
+        function displayResults(result) {
+            // Show result section
+            resultSection.style.display = 'block';
+            
+            // Display text result
+            textResult.textContent = result.text || 'No text extracted';
+            
+            // Display HTML result if available
+            if (result.html_available && result.html) {
+                const decodedHtml = atob(result.html);
+                const blob = new Blob([decodedHtml], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                htmlPreview.src = url;
+                
+                // Enable HTML tab
+                document.querySelector('.tab[data-tab="html"]').style.display = 'block';
+                downloadHtmlBtn.style.display = 'inline-block';
+            } else {
+                // Hide HTML tab if not available
+                document.querySelector('.tab[data-tab="html"]').style.display = 'none';
+                downloadHtmlBtn.style.display = 'none';
+            }
+            
+            // Scroll to results
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+        
+        // Copy text button
+        copyTextBtn.addEventListener('click', function() {
+            const text = textResult.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="material-icons">check</i> Copied!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+        
+        // Download text button
+        downloadTextBtn.addEventListener('click', function() {
+            const text = textResult.textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ocr-result-${new Date().toISOString().slice(0, 10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // Download HTML button
+        downloadHtmlBtn.addEventListener('click', function() {
+            const htmlContent = htmlPreview.src;
+            const a = document.createElement('a');
+            a.href = htmlContent;
+            a.download = `ocr-result-${new Date().toISOString().slice(0, 10)}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+        
+        // Alert handling
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
