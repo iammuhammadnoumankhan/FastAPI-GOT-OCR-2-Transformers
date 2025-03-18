@@ -1,4 +1,3 @@
-```markdown
 # GOT-OCR 2.0 Microservice 🚀
 
 State-of-the-art OCR microservice powered by Transformers and FastAPI, supporting multiple OCR tasks and formats.
@@ -128,15 +127,6 @@ APACHE 2.0 License
 - Rate limiting
 ``` 
 
-This README provides:
-1. Clear installation instructions for different environments
-2. Comprehensive API documentation
-3. Ready-to-use Docker configurations
-4. Practical examples for all OCR scenarios
-5. Error handling guidance
-6. Scalability recommendations
-
-The Markdown structure is optimized for GitHub rendering with proper badges, tables, and code formatting.
 ```
 
 ## More CURLs Commands:
